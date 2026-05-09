@@ -1,0 +1,84 @@
+# Виртуальные окружения
+venv/
+env/
+.venv/
+
+# Python байт‑код и кэши
+__pycache__/
+*.py[cod]
+*.so
+*.pyc
+*.pyo
+
+# Файлы дистрибутивов и упаковки
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.eggs/
+lib/
+lib64/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Журналы и временные файлы
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Отчёты тестов и покрытия
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+htmlcov/
+.pytest_cache/
+
+# IDE и редакторы
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Локальные настройки и конфиденциальные данные
+*.env
+.env
+.env.local
+.env.*.local
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Документация
+docs/_build/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# IPython/Jupyter
+.ipynb_checkpoints
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+
+# Другие временные файлы проекта
+*.log
+.coverage.*
+.pytest/
