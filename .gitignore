@@ -1,0 +1,40 @@
+# PyCharm
+.idea/
+
+# Python
+__pycache__/
+*.pyc# PyCharm
+.idea/
+
+# Python byte code
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Файлы ОС
+.DS_Store
+Thumbs.db
