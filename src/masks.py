@@ -15,9 +15,10 @@ def get_mask_card_number(card_number: str) -> str:
     if len(cleaned_number) != 16:
         raise ValueError("Номер карты должен содержать 16 цифр")
 
-    # Формируем маску: первые 6 цифр, затем 6 звёздочек, затем последние 4 цифры
-    masked = f"{cleaned_number[:4]} {cleaned_number[4:6]}" f"** **** {cleaned_number[-4:]}"
+    # Формируем маску: первые 4 цифры, пробел, следующие 2 цифры, 6 звёздочек, пробел, 4 звёздочки, пробел, последние 4 цифры
+    masked = f"{cleaned_number[:4]} {cleaned_number[4:6]}** **** {cleaned_number[-4:]}"
     return masked
+
 
 
 def get_mask_account(account_number: str) -> str:
@@ -37,5 +38,5 @@ def get_mask_account(account_number: str) -> str:
     if len(cleaned_number) < 4:
         raise ValueError("Номер счёта должен содержать не менее 4 цифр")
 
-    # Берём последние 4 цифры и добавляем две звёздочки перед ними
-    return f"**{cleaned_number[-4:]}"
+    # Берём последние 4 цифры и добавляем звёздочку перед ними
+    return f"*{cleaned_number[-4:]}"
