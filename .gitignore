@@ -31,11 +31,11 @@ pip-delete-this-directory.txt
 
 # Отчёты тестов и покрытия
 .tox/
-.coverage
+
 .cache
 nosetests.xml
-coverage.xml
-htmlcov/
+
+
 .pytest_cache/
 
 # IDE и редакторы
@@ -80,5 +80,5 @@ docs/_build/
 
 # Другие временные файлы проекта
 *.log
-.coverage.*
+
 .pytest/

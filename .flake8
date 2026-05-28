@@ -4,3 +4,4 @@ exclude = .git, __pycache__, tests/, src/__init__.py
 select = B,C,E,F,W,T4,B9
 ignore = E203, E501, W503
 inline-quotes = double
+ignore = F401
