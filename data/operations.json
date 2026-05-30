@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "amount": 100,
+    "currency": "USD",
+    "description": "Оплата услуг"
+  },
+  {
+    "id": 2,
+    "amount": 5000,
+    "currency": "RUB",
+    "description": "Перевод зарплаты"
+  },
+  {
+    "id": 3,
+    "amount": 200,
+    "currency": "EUR",
+    "description": "Покупка товаров"
+  }
+]
