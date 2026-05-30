@@ -6,10 +6,15 @@ load_dotenv()  # Загружаем переменные из .env
 API_KEY = os.getenv('EXCHANGE_RATE_API_KEY')
 BASE_URL = 'https://api.apilayer.com/exchangerates_data/latest'
 
+
 def convert_currency(transaction):
     """Конвертирует сумму транзакции из USD/EUR в рубли."""
-    amount = transaction.get('amount', 0.0)
-    currency = transaction.get('currency', 'RUB')
+
+    # ПРАВИЛЬНЫЙ способ достать сумму
+    amount = transaction.get("operationAmount").get('amount', 0.0)
+
+    # ПРАВИЛЬНЫЙ способ достать код валюты (например, 'USD' или 'EUR')
+    currency = transaction.get("operationAmount").get('currency').get('code')
 
     if currency == 'RUB':  # Если уже рубли
         return float(amount)
