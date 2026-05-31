@@ -17,3 +17,6 @@ def read_json_file(file_path):
 
     except (FileNotFoundError, json.JSONDecodeError, UnicodeDecodeError):
         return []
+
+
+
