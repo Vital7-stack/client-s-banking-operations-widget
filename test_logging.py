@@ -1,41 +1,15 @@
-import os
-import logging
+from src.utils import calculate_sum  # убираем несуществующую функцию
+from src.masks import get_mask_card_number, get_mask_account  # используем реальные имена
 
-# Создаём папку logs, если её нет
-os.makedirs('logs', exist_ok=True)
+if __name__ == "__main__":
+    # Тестируем логирование в utils
+    calculate_sum(5, 3)  # оставляем существующую функцию
 
-# Настраиваем логгер для модуля utils
-utils_logger = logging.getLogger('utils')
-utils_logger.setLevel(logging.DEBUG)
+    # Тестируем логирование в masks
+    result_card = get_mask_card_number("1234 5678 9012 3456")
+    print(f"Маскированный номер карты: {result_card}")
 
-# Очищаем существующие handler'ы
-utils_logger.handlers.clear()
+    result_account = get_mask_account("12345678901234567890")
+    print(f"Маскированный номер счёта: {result_account}")
 
-# Форматирование логов
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
-
-# FileHandler с перезаписью при каждом запуске
-utils_handler = logging.FileHandler('logs/utils.log', mode='w', encoding='utf-8')
-utils_handler.setFormatter(formatter)
-utils_logger.addHandler(utils_handler)
-
-# Аналогично для модуля masks
-masks_logger = logging.getLogger('masks')
-masks_logger.setLevel(logging.DEBUG)
-masks_logger.handlers.clear()
-
-masks_handler = logging.FileHandler('logs/masks.log', mode='w', encoding='utf-8')
-masks_handler.setFormatter(formatter)
-masks_logger.addHandler(masks_handler)
-
-# Пишем логи в требуемом формате
-utils_logger.info("Функция some_utility_function успешно выполнена")
-masks_logger.error("Ошибка при применении маски: Some error")
-
-print("✅ Проверка завершена!")
-print("📁 Проверьте папку 'logs' — в ней должны появиться файлы:")
-print("   - utils.log")
-print("   - masks.log")
+    print("Проверьте файлы logs/utils.log и logs/masks.log")

@@ -1,132 +1,94 @@
-from typing import Optional
 import logging
+from pathlib import Path
 
-# Настройка логера (если нет отдельного модуля logging_config)
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger('masks')
-
-
-def get_mask_account(account_number: Optional[str]) -> str:
-    """Маскирует номер счёта, заменяя все цифры на звёздочки, кроме последних 4 (если их больше 4)."""
-    if account_number is None:
-        logger.warning("Получен None вместо номера счёта")
-        return ""
-
-    account_str: str = account_number.strip()
-
-    if not account_str:
-        logger.warning("Получена пустая строка или строка с пробелами вместо номера счёта")
-        return ""
-
-    length: int = len(account_str)
-
-    if length < 4:
-        if length == 0:
-            return ""
-        elif length == 1:
-            logger.info("Номер счёта из 1 цифры — возвращается без маскировки")
-            return account_str
-        elif length == 2:
-            logger.info("Номер счёта из 2 цифр — маскируется первая цифра")
-            return f"*{account_str[-1]}"
-        else:  # length == 3
-            logger.info("Номер счёта из 3 цифр — маскируются первые две цифры")
-            return f"**{account_str[-1]}"
-    elif length == 4:
-        # Для длины 4 маскируем все цифры
-        logger.info("Номер счёта из 4 цифр — все цифры маскируются")
-        return "****"
-    else:
-        # Для длины > 4 маскируем всё, кроме последних 4 цифр
-        logger.info(f"Номер счёта длиной {length} — маскируются все цифры, кроме последних 4")
-        return "*" * (length - 4) + account_str[-4:]
+# Настройка логирования
+log_dir = Path('logs')
+log_dir.mkdir(exist_ok=True)
+masks_logger = logging.getLogger('masks')
+file_handler = logging.FileHandler(log_dir / 'masks.log')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+masks_logger.addHandler(file_handler)
+masks_logger.setLevel(logging.DEBUG)
 
 
+def get_mask_account(account_number: str) -> str:
+    """Маскирует номер счёта, оставляя видимыми только последние 4 цифры."""
+    if not isinstance(account_number, str):
+        masks_logger.error(f"get_mask_account: некорректный тип данных: {type(account_number)}")
+        raise TypeError("Номер счёта должен быть строкой")
 
-def get_mask_card_number(card_input: Optional[str]) -> str:
-    """Маскирует номер карты, оставляя видимыми первые 4 и последние 4 цифры."""
-    if card_input is None:
-        logger.warning("Получен None вместо номера карты")
-        return ""
-    if not isinstance(card_input, str):
-        logger.error(f"Некорректный тип данных для номера карты: {type(card_input)}")
-        return ""
+    # Удаляем пробелы и дефисы
+    cleaned = account_number.replace(' ', '').replace('-', '')
 
-    cleaned: str = card_input.replace(" ", "").replace("-", "")
-
-    if len(cleaned) != 16 or not cleaned.isdigit():
-        logger.error(f"Некорректный номер карты: {card_input} (очищенный: {cleaned})")
-        return ""
-
-    formatted: str = f"{cleaned[:4]} {cleaned[4:8]}** **** {cleaned[-4:]}"
-    logger.info(f"Номер карты успешно замаскирован: {formatted}")
-    return formatted
-
-
-
-def mask_account_card(input_data: Optional[str]) -> str:
-    """Распознаёт тип данных (карта/счёт) и возвращает маску с указанием типа."""
-    if input_data is None:
-        logger.warning("Получен None в качестве входных данных")
-        return "invalid input"
-    if not isinstance(input_data, str):
-        logger.error(f"Некорректный тип входных данных: {type(input_data)}")
-        return "invalid input"
-
-    cleaned: str = input_data.replace(" ", "").replace("-", "").replace("\t", "")
+    if len(cleaned) < 4:
+        masks_logger.error(f"get_mask_account: номер счёта слишком короткий: {cleaned}")
+        raise ValueError("Номер счёта слишком короткий")
 
     if not cleaned.isdigit():
-        logger.error(f"Входные данные содержат нецифровые символы: {input_data}")
+        masks_logger.error(f"get_mask_account: номер счёта содержит нецифровые символы: {cleaned}")
+        raise ValueError("Номер счёта должен содержать только цифры")
+
+    # Всегда маскируем все цифры, кроме последних 4
+    masked = '*' * (len(cleaned) - 4) + cleaned[-4:]
+
+    # СПЕЦИАЛЬНОЕ ПРАВИЛО: если длина маски равна 4 (ровно 4 цифры), заменяем на 4 звёздочки
+    if len(masked) == 4:
+        masked = '****'
+
+    masks_logger.debug(f"get_mask_account({account_number}): {masked}")
+    return masked
+
+def get_mask_card_number(card_number: str) -> str:
+    """Маскирует номер карты, оставляя видимыми первые 6 и последние 4 цифры."""
+    if not isinstance(card_number, str):
+        masks_logger.error(f"get_mask_card_number: некорректный тип данных: {type(card_number)}")
+        raise TypeError("Номер карты должен быть строкой")
+
+    # Удаляем пробелы и дефисы
+    cleaned = card_number.replace(' ', '').replace('-', '')
+
+    if len(cleaned) != 16:
+        masks_logger.error(f"get_mask_card_number: некорректная длина номера карты: {len(cleaned)}")
+        raise ValueError("Номер карты должен содержать 16 цифр")
+
+    if not cleaned.isdigit():
+        masks_logger.error(f"get_mask_card_number: номер карты содержит нецифровые символы: {cleaned}")
+        raise ValueError("Номер карты должен содержать только цифры")
+
+    masked = cleaned[:6] + '*' * 6 + cleaned[-4:]
+    # Форматируем с пробелами: 1234 56** **** 3456
+    formatted = f"{masked[:4]} {masked[4:8]} {masked[8:12]} {masked[12:]}"
+    masks_logger.debug(f"get_mask_card_number({card_number}): {formatted}")
+    return formatted
+
+def mask_account_card(input_number: str | None) -> str:
+    """Автоматически определяет тип номера (карта или счёт) и применяет соответствующую маску."""
+    # Обработка None
+    if input_number is None:
         return "invalid input"
 
-    length: int = len(cleaned)
+    if not isinstance(input_number, str):
+        masks_logger.error(f"mask_account_card: некорректный тип данных: {type(input_number)}")
+        return "invalid input"
 
-    masked: str
-    account_type: str
+    if not input_number:
+        return "invalid input"
 
-    if length == 16:
-        masked = get_mask_card_number(cleaned)
-        account_type = "card"
-        logger.info("Обнаружен номер карты (16 цифр)")
-    elif length >= 20:
-        masked = get_mask_account(cleaned)
-        account_type = "account"
-        logger.info(f"Обнаружен номер счёта (длина {length} цифр)")
+    # Очищаем от пробелов и дефисов
+    cleaned = input_number.replace(' ', '').replace('-', '')
+
+    if len(cleaned) == 16 and cleaned.isdigit():
+        try:
+            masked = get_mask_card_number(input_number)
+            return f"{masked} (card)"
+        except ValueError:
+            return "invalid input"
+    elif len(cleaned) == 20 and cleaned.isdigit():
+        try:
+            masked = get_mask_account(input_number)
+            return f"{masked} (account)"
+        except ValueError:
+            return "invalid input"
     else:
-        logger.warning(f"Неподдерживаемая длина данных: {length}")
         return "invalid input"
-
-    result = f"{masked} ({account_type})"
-    logger.info(f"Результат маскировки: {result}")
-    return result
-
-
-
-def apply_mask(input_data: Optional[str]) -> str:
-    """
-    Основная функция для применения маскировки к входным данным.
-    Возвращает замаскированную строку с указанием типа (карта/счёт) или сообщение об ошибке.
-    """
-    try:
-        result = mask_account_card(input_data)
-        if result != "invalid input":
-            logger.info("Маска успешно применена")
-        else:
-            logger.warning("Не удалось применить маску — некорректные входные данные")
-        return result
-    except Exception as e:
-        logger.error(f"Критическая ошибка при применении маски: {e}")
-        return "error during masking"
-
-# Примеры использования
-if __name__ == "__main__":
-    # Тестовые случаи
-    print(apply_mask("1234567890123456"))  # Карта
-    print(apply_mask("40702810500000012345"))  # Счёт
-    print(apply_mask("123"))  # Некорректные данные
-    print(apply_mask(None))  # None
-    print(apply_mask("12 34 56 78 90 12 34 56"))  # Карта с пробелами
-    print(apply_mask("4070-2810-5000-0001-2345"))  # Счёт с дефисами
