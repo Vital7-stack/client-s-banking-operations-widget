@@ -2,26 +2,24 @@ import logging
 from pathlib import Path
 from typing import Any
 
+
 def setup_logger(
-    name: str,
-    log_file: str = 'logs/masks.log',
-    level: int = logging.DEBUG
+    name: str, log_file: str = "logs/masks.log", level: int = logging.DEBUG
 ) -> logging.Logger:
     """Настраивает логгер с записью в файл и консоль."""
     log_path = Path(log_file)
     log_path.parent.mkdir(parents=True, exist_ok=True)
-
 
     logger = logging.getLogger(name)
     logger.setLevel(level)
     logger.handlers.clear()
 
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S,%f'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S,%f",
     )
 
-    file_handler = logging.FileHandler(log_file, encoding='utf-8')
+    file_handler = logging.FileHandler(log_file, encoding="utf-8")
     file_handler.setLevel(level)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
@@ -32,6 +30,7 @@ def setup_logger(
     logger.addHandler(console_handler)
 
     return logger
+
 
 def calculate_sum(a_input: Any, b_input: Any, logger: logging.Logger) -> str:
     """
@@ -53,7 +52,9 @@ def calculate_sum(a_input: Any, b_input: Any, logger: logging.Logger) -> str:
         # Вычисляем результат внутри блока try
         concatenated_result = a_str + b_str
         # Логируем отладочную информацию
-        logger.debug(f"calculate_sum({repr(a_input)}, {repr(b_input)}) = {concatenated_result}")
+        logger.debug(
+            f"calculate_sum({repr(a_input)}, {repr(b_input)}) = {concatenated_result}"
+        )
         return concatenated_result
     except Exception as exc:
         # Используем другое имя для исключения
@@ -64,20 +65,21 @@ def calculate_sum(a_input: Any, b_input: Any, logger: logging.Logger) -> str:
         )
         raise
 
+
 # Настройка глобального логгера
-main_logger = setup_logger('utils', 'logs/app.log')
+main_logger = setup_logger("utils", "logs/app.log")
 
 if __name__ == "__main__":
     print("=== Тестирование функции calculate_sum ===")
 
     tests = [
-        ('Сумма: ', 100),
-        (None, 'текст'),
-        ('текст', None),
+        ("Сумма: ", 100),
+        (None, "текст"),
+        ("текст", None),
         (None, None),
         (123, 456),
-        ('', ''),
-        ('Число: ', 42.5),
+        ("", ""),
+        ("Число: ", 42.5),
     ]
 
     for test_a, test_b in tests:

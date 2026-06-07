@@ -1,5 +1,8 @@
+from src.masks import (  # используем реальные имена
+    get_mask_account,
+    get_mask_card_number,
+)
 from src.utils import calculate_sum  # убираем несуществующую функцию
-from src.masks import get_mask_card_number, get_mask_account  # используем реальные имена
 
 if __name__ == "__main__":
     # Тестируем логирование в utils
