@@ -15,9 +15,7 @@ class TestWidget:
             ("1234 5678 9012 3456 7890", "account"),
         ],
     )
-    def test_mask_account_card_type_recognition(
-        self, input_data: str, expected_type: str
-    ) -> None:
+    def test_mask_account_card_type_recognition(self, input_data: str, expected_type: str) -> None:
         """Проверка распознавания типа данных (карта/счёт)."""
         result: str = mask_account_card(input_data)
         assert expected_type in result.lower()
@@ -31,9 +29,7 @@ class TestWidget:
             (None, ""),
         ],
     )
-    def test_get_date_formatting(
-        self, date_input: Optional[str], expected_format: str
-    ) -> None:
+    def test_get_date_formatting(self, date_input: Optional[str], expected_format: str) -> None:
         """Тестирование преобразования даты в различные форматы."""
         result: str = get_date(date_input)
         assert result == expected_format
