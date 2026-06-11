@@ -1,60 +1,53 @@
-from typing import Any, Dict, List
-
 import pytest
+from collections import Counter
+from src.processing import filter_by_state, sort_by_date, process_bank_search, process_bank_operations
 
-from src.processing import filter_by_state, sort_by_date
+
+def test_filter_by_state_case_insensitive():
+    data = [
+        {"state": "executed", "description": "test"},
+        {"state": "EXECUTED", "description": "test2"},
+        {"state": "canceled", "description": "test3"},
+    ]
+    assert len(filter_by_state(data, "executed")) == 2
+    assert len(filter_by_state(data, "CANCELED")) == 1
 
 
-class TestProcessing:
-    def test_filter_by_state_executed(
-        self, sample_transactions: List[Dict[str, Any]]
-    ) -> None:
-        """Фильтрация по статусу EXECUTED."""
-        filtered: List[Dict[str, Any]] = filter_by_state(
-            sample_transactions, "EXECUTED"
-        )
-        assert len(filtered) == 3
-        assert all(t["state"] == "EXECUTED" for t in filtered)
+def test_sort_by_date_asc():
+    data = [
+        {"date": "2024-01-03", "description": "c"},
+        {"date": "2024-01-01", "description": "a"},
+        {"date": "2024-01-02", "description": "b"},
+    ]
+    sorted_data = sort_by_date(data, reverse=False)
+    dates = [t["date"] for t in sorted_data]
+    assert dates == ["2024-01-01", "2024-01-02", "2024-01-03"]
 
-    def test_filter_by_state_not_found(
-        self, sample_transactions: List[Dict[str, Any]]
-    ) -> None:
-        """Фильтрация по несуществующему статусу."""
-        filtered: List[Dict[str, Any]] = filter_by_state(
-            sample_transactions, "CANCELLED"
-        )
-        assert len(filtered) == 0
 
-    @pytest.mark.parametrize("sort_order,expected_first_id", [("asc", 1), ("desc", 4)])
-    def test_sort_by_date(
-        self,
-        sample_transactions: List[Dict[str, Any]],
-        sort_order: str,
-        expected_first_id: int,
-    ) -> None:
-        """Сортировка по дате в разных направлениях."""
-        sorted_transactions: List[Dict[str, Any]] = sort_by_date(
-            sample_transactions, order=sort_order
-        )
-        assert sorted_transactions[0]["id"] == expected_first_id
+def test_process_bank_search_regex_match():
+    data = [
+        {"description": "Перевод организации"},
+        {"description": "перевод организации"},
+        {"description": "Оплата услуг"},
+    ]
+    res = process_bank_search(data, "перевод")
+    assert len(res) == 2
 
-    def test_sort_by_same_dates(self) -> None:
-        """Сортировка при одинаковых датах."""
-        transactions: List[Dict[str, Any]] = [
-            {"id": 1, "date": "2023-01-01"},
-            {"id": 2, "date": "2023-01-01"},
-        ]
-        sorted_transactions: List[Dict[str, Any]] = sort_by_date(
-            transactions, order="asc"
-        )
-        assert sorted_transactions[0]["id"] == 1  # Порядок сохраняется
 
-    @pytest.fixture
-    def sample_transactions(self) -> List[Dict[str, Any]]:
-        """Пример транзакций для тестирования."""
-        return [
-            {"id": 1, "state": "EXECUTED", "date": "2023-01-01"},
-            {"id": 2, "state": "EXECUTED", "date": "2023-01-02"},
-            {"id": 3, "state": "PENDING", "date": "2023-01-03"},
-            {"id": 4, "state": "EXECUTED", "date": "2023-01-04"},
-        ]
+def test_process_bank_search_empty_query():
+    data = [{"description": "abc"}, {"description": "xyz"}]
+    res = process_bank_search(data, "")
+    assert res == data
+
+
+def test_process_bank_operations_counter():
+    data = [
+        {"description": "Перевод организации"},
+        {"description": "Перевод с карты"},
+        {"description": "Снятие наличных"},
+        {"description": "снятие наличных"},
+    ]
+    cats = ["Перевод", "снятие"]
+    res = process_bank_operations(data, cats)
+    assert res["Перевод"] == 2
+    assert res["снятие"] == 2
