@@ -15,7 +15,9 @@ class TestMasks:
             ("   ", ""),
         ],
     )
-    def test_get_mask_account(self, account_input: Optional[str], expected_output: str) -> None:
+    def test_get_mask_account(
+        self, account_input: Optional[str], expected_output: str
+    ) -> None:
         assert get_mask_account(account_input) == expected_output
 
     @pytest.mark.parametrize(
